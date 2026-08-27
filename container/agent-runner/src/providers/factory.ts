@@ -1,13 +1,48 @@
 import type { AgentProvider, ProviderOptions } from './types.js';
 import { getProviderFactory } from './provider-registry.js';
+import '../provider-contracts/index.js';
+import { getProviderRuntimeContract } from '../provider-contracts/registry.js';
+import {
+  archiveProviderExchangeFromContract,
+  bindProviderRuntimeInputs,
+  maybeRotateProviderContinuation,
+  realizeProviderManagedFiles,
+} from '../provider-contracts/realize.js';
+import type { RuntimeConfigurationInputs } from '../provider-contracts/registry.js';
 
-/**
- * Any registered provider name. Kept as a named alias for readability; the
- * set of valid names is open and determined at runtime by whichever provider
- * modules the `providers/index.ts` barrel imports.
- */
-export type ProviderName = string;
+export function createProvider(name: string, options: ProviderOptions = {}): AgentProvider {
+  const contract = getProviderRuntimeContract(name);
+  // The core-owned inputs for this instance: one object, owned here, closed
+  // over by the render path below.
+  const inputs: Partial<RuntimeConfigurationInputs> = {
+    inference: { model: options.model, effort: options.effort, fastMode: options.fastMode },
+    mcpServers: options.mcpServers ?? {},
+  };
+  const provider = getProviderFactory(name)(
+    contract
+      ? {
+          ...options,
+          coreIo: {
+            realizeManagedFiles: (when, context) => realizeProviderManagedFiles(name, when, context, inputs),
+          },
+        }
+      : options,
+  );
+  if (contract) {
+    bindProviderRuntimeInputs(provider, inputs);
 
-export function createProvider(name: ProviderName, options: ProviderOptions = {}): AgentProvider {
-  return getProviderFactory(name)(options);
+    if (contract.archives?.trigger === 'exchange-complete') {
+      provider.onExchangeComplete = (exchange) => {
+        archiveProviderExchangeFromContract(name, exchange);
+      };
+    }
+
+    if (contract.continuationRotation) {
+      provider.maybeRotateContinuation = (continuation) =>
+        maybeRotateProviderContinuation(name, continuation, options.assistantName, (message) =>
+          console.error(`[${name}-provider] ${message}`),
+        );
+    }
+  }
+  return provider;
 }
