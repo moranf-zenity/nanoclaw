@@ -1,0 +1,5 @@
+# Auto-stamp the NanoClaw upgrade tripwire after every commit, so a local
+# commit never leaves the next reboot crash-looping on the tripwire.
+# Any commit changes the checkout identity; this re-blesses it immediately.
+export PATH="/opt/homebrew/bin:$PATH"
+pnpm exec tsx scripts/upgrade-state.ts set >> logs/upgrade-stamp.log 2>&1 || true
