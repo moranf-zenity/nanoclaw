@@ -11,9 +11,6 @@ importers:
       '@chat-adapter/slack':
         specifier: 4.29.0
         version: 4.29.0
-      '@chat-adapter/telegram':
-        specifier: 4.29.0
-        version: 4.29.0
       '@clack/core':
         specifier: ^1.2.0
         version: 1.2.0
@@ -84,10 +81,6 @@ packages:
 
   '@chat-adapter/slack@4.29.0':
     resolution: {integrity: sha512-s2DXAwkTpmiIKSATXgrO879s1pqFwS70Y0JPd+TRGRzDeh6nfqt5dnKt5Bug0P1zwkB6DoPurhnYS9nqhSmD/w==}
-    engines: {node: '>=20'}
-
-  '@chat-adapter/telegram@4.29.0':
-    resolution: {integrity: sha512-015tU3HEjFQWw7DgebXWkDeQA6lTdTVEO4btAV3f6U1kEnOfjLVJq98latcsM1WkEvv+3LIFKpsz9pG53aamBw==}
     engines: {node: '>=20'}
 
   '@clack/core@1.2.0':
@@ -1605,15 +1598,6 @@ snapshots:
       - debug
       - supports-color
       - utf-8-validate
-      - zod
-
-  '@chat-adapter/telegram@4.29.0':
-    dependencies:
-      '@chat-adapter/shared': 4.29.0
-      chat: 4.29.0
-    transitivePeerDependencies:
-      - ai
-      - supports-color
       - zod
 
   '@clack/core@1.2.0':
