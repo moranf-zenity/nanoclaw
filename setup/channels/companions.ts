@@ -25,7 +25,6 @@
  */
 
 import { registerSlackAutoProvision } from './slack-auto-register.js';
-import { registerTelegramPreStep } from './telegram-pre-step.js';
 
 /**
  * A channel's auto-provision pre-step. `agentName` is the operator's resolved
@@ -63,4 +62,3 @@ export function getCompanionSkills(channel: string): readonly string[] {
 // Registrations shipped with trunk. The register function is passed in
 // (rather than the shim importing it) so each shim stays cycle-free.
 registerSlackAutoProvision(registerChannelPreStep, registerCompanionSkills);
-registerTelegramPreStep(registerChannelPreStep);

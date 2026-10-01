@@ -59,7 +59,6 @@ export const STEP_FILES: Record<string, string[]> = {
   // Channel-specific sub-steps:
   'telegram-install': ['.claude/skills/add-telegram/SKILL.md', 'scripts/skill-apply.ts', 'setup/channels/telegram.ts'],
   'telegram-validate': ['setup/channels/telegram.ts'],
-  'pair-telegram': ['setup/pair-telegram.ts', 'setup/channels/telegram.ts'],
   'discord-install': ['.claude/skills/add-discord/SKILL.md', 'scripts/skill-apply.ts', 'setup/channels/discord.ts'],
   'slack-install': ['.claude/skills/add-slack/SKILL.md', 'scripts/skill-apply.ts', 'setup/channels/slack.ts'],
   'slack-validate': ['setup/channels/slack.ts'],
