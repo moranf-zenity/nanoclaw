@@ -11,7 +11,6 @@ const STEPS: Record<string, () => Promise<{ run: (args: string[]) => Promise<voi
   environment: () => import('./environment.js'),
   container: () => import('./container.js'),
   register: () => import('./register.js'),
-  'pair-telegram': () => import('./pair-telegram.js'),
   'pair-dial': () => import('./pair-dial.js'),
   groups: () => import('./groups.js'),
   'whatsapp-auth': () => import('./whatsapp-auth.js'),

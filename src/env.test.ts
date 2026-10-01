@@ -51,3 +51,39 @@ describe('envValue', () => {
     expect(envValue('TOKEN', root)).toBe('abc=def==');
   });
 });
+
+/**
+ * A `keychain://<service>/<account>` value is resolved against the macOS login
+ * Keychain so a secret never sits in .env as plaintext. These pin the safe
+ * degradations: a value that is not a reference is untouched, and any reference
+ * that cannot be read (missing item here, and no `security` at all on Linux CI)
+ * is dropped — exactly like an absent secret — never surfaced literally.
+ */
+describe('keychain secret references', () => {
+  let root: string;
+
+  beforeEach(() => {
+    root = fs.mkdtempSync(path.join(os.tmpdir(), 'nanoclaw-env-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  const write = (content: string): void => fs.writeFileSync(path.join(root, '.env'), content);
+
+  it('returns a non-reference value unchanged', () => {
+    write('TELEGRAM_BOT_TOKEN=123456:AAbc-def\n');
+    expect(envValue('TELEGRAM_BOT_TOKEN', root)).toBe('123456:AAbc-def');
+  });
+
+  it('drops a reference that cannot be resolved, like an absent secret', () => {
+    write('TELEGRAM_BOT_TOKEN=keychain://nanoclaw-absent-service/NANOCLAW_ABSENT_ACCOUNT\n');
+    expect(envValue('TELEGRAM_BOT_TOKEN', root)).toBeUndefined();
+  });
+
+  it('drops a malformed reference with no account part', () => {
+    write('TELEGRAM_BOT_TOKEN=keychain://service-only\n');
+    expect(envValue('TELEGRAM_BOT_TOKEN', root)).toBeUndefined();
+  });
+});
